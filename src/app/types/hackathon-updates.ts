@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const HackathonSchema = z.object({
+  id: z.string().describe('Unique identifier for the hackathon event.'),
   title: z.string().describe('The title of the hackathon event.'),
   description: z
     .string()

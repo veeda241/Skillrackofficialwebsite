@@ -3,15 +3,24 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Briefcase, Terminal } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Briefcase, Terminal, Trash2 } from 'lucide-react';
+import { useEffect, useState, useTransition } from 'react';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Hackathon } from '@/app/types/hackathon-updates';
 import Link from 'next/link';
-import { fetchHackathonUpdates } from '@/app/actions/hackathons';
+import { fetchHackathonUpdates, removeHackathon } from '@/app/actions/hackathons';
+import { useToast } from '@/hooks/use-toast';
 
-function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
+function HackathonCard({ hackathon, onRemove }: { hackathon: Hackathon, onRemove: (id: string) => void }) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleRemove = () => {
+    startTransition(() => {
+        onRemove(hackathon.id);
+    });
+  };
+
   return (
     <Card className="overflow-hidden">
       <div className="md:flex">
@@ -25,7 +34,7 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
             data-ai-hint={hackathon.imageHint}
           />
         </div>
-        <div className="p-6 flex flex-col justify-between">
+        <div className="p-6 flex flex-col justify-between w-full">
           <div>
             <h3 className="text-xl font-semibold font-headline">{hackathon.title}</h3>
             <CardDescription className="mt-1">{hackathon.date}</CardDescription>
@@ -42,6 +51,10 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
                     Learn More
                 </Link>
             </Button>
+            <Button variant="destructive" onClick={handleRemove} disabled={isPending}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                {isPending ? 'Removing...' : 'Remove'}
+            </Button>
           </div>
         </div>
       </div>
@@ -53,26 +66,47 @@ export function HackathonUpdates() {
   const [updates, setUpdates] = useState<Hackathon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const getUpdates = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchHackathonUpdates();
+      if (result.success && result.data) {
+        setUpdates(result.data.hackathons);
+      } else {
+        setError(result.error || 'Failed to fetch hackathon updates.');
+      }
+    } catch (e) {
+      setError('An unexpected error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getUpdates = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const result = await fetchHackathonUpdates();
-        if (result.success && result.data) {
-          setUpdates(result.data.hackathons);
-        } else {
-          setError(result.error || 'Failed to fetch hackathon updates.');
-        }
-      } catch (e) {
-        setError('An unexpected error occurred.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
     getUpdates();
   }, []);
+
+  const handleRemoveHackathon = async (id: string) => {
+    const result = await removeHackathon(id);
+    if (result.success) {
+      toast({
+        title: 'Success',
+        description: 'Hackathon removed successfully.',
+      });
+      // Refresh the list from the server
+      getUpdates();
+    } else {
+      toast({
+        title: 'Error',
+        description: result.error,
+        variant: 'destructive'
+      });
+    }
+  };
+
 
   return (
     <Card className="shadow-lg">
@@ -102,8 +136,8 @@ export function HackathonUpdates() {
         )}
         {!isLoading && !error && updates.length > 0 && (
             <div className="space-y-4">
-                {updates.map((hackathon, index) => (
-                    <HackathonCard key={index} hackathon={hackathon} />
+                {updates.map((hackathon) => (
+                    <HackathonCard key={hackathon.id} hackathon={hackathon} onRemove={handleRemoveHackathon} />
                 ))}
             </div>
         )}

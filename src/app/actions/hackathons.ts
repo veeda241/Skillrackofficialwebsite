@@ -17,11 +17,30 @@ export async function fetchHackathonUpdates(): Promise<{ success: true; data: Ha
   }
 }
 
-export async function addHackathon(hackathon: Hackathon): Promise<{ success: true } | { success: false; error: string }> {
+export async function addHackathon(hackathon: Omit<Hackathon, 'id'>): Promise<{ success: true } | { success: false; error: string }> {
     try {
+        const newHackathon: Hackathon = {
+            ...hackathon,
+            id: Date.now().toString(), // Simple unique ID
+        };
         // Add the new hackathon to the beginning of the list.
-        allHackathons.unshift(hackathon);
+        allHackathons.unshift(newHackathon);
         // Revalidate the dashboard path to ensure it fetches the updated list.
+        revalidatePath('/dashboard');
+        return { success: true };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return { success: false, error: errorMessage };
+    }
+}
+
+export async function removeHackathon(hackathonId: string): Promise<{ success: true } | { success: false; error: string }> {
+    try {
+        const index = allHackathons.findIndex((h) => h.id === hackathonId);
+        if (index > -1) {
+            allHackathons.splice(index, 1);
+        }
         revalidatePath('/dashboard');
         return { success: true };
     } catch(e) {
