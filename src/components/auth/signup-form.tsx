@@ -10,6 +10,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { signup, signupAdmin } from '@/app/actions/auth';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -19,6 +21,7 @@ const formSchema = z.object({
 
 export function SignupForm({ isAdmin = false }: { isAdmin?: boolean }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -30,19 +33,33 @@ export function SignupForm({ isAdmin = false }: { isAdmin?: boolean }) {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    console.log({ ...values, role: isAdmin ? 'admin' : 'member' });
-    // Simulate signup
-    setTimeout(() => {
-        router.push('/dashboard');
-    }, 1000);
+    
+    const action = isAdmin ? signupAdmin : signup;
+    const result = await action(values);
+
+    if (result.success) {
+        toast({
+            title: 'Account Created!',
+            description: "You've been successfully signed up. Redirecting to login...",
+        });
+        router.push('/login');
+    } else {
+        toast({
+            title: 'Sign Up Failed',
+            description: result.error,
+            variant: 'destructive'
+        });
+    }
+
+    setIsSubmitting(false);
   }
 
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>{isAdmin ? 'Admin Sign Up' : 'Sign Up'}</CardTitle>
+        <CardTitle>{isAdmin ? 'Admin Sign Up' : 'Create an Account'}</CardTitle>
         <CardDescription>It's quick and easy to get started.</CardDescription>
       </CardHeader>
       <CardContent>
