@@ -49,7 +49,6 @@ export default function AdminHackathonsPage() {
         });
         form.reset();
         router.push('/dashboard');
-        router.refresh();
     } else {
         toast({
             title: 'Error',

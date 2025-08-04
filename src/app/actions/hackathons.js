@@ -1,4 +1,5 @@
 'use server';
+import { revalidatePath } from 'next/cache';
 
 // In a real application, you would fetch this data from a database.
 // For now, we are storing it in-memory. This will reset on server restart.
@@ -45,6 +46,7 @@ export async function fetchHackathonUpdates() {
 export async function addHackathon(hackathon) {
     try {
         MOCK_HACKATHONS.unshift(hackathon);
+        revalidatePath('/dashboard');
         return { success: true };
     } catch(e) {
         console.error(e);
