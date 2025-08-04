@@ -18,20 +18,7 @@ export function TeamRoster() {
         <CardTitle>Team Roster</CardTitle>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-4">
-          {teamMembers.map((member) => (
-            <li key={member.id} className="flex items-center gap-4">
-              <Avatar className='h-12 w-12'>
-                <AvatarImage src={`https://placehold.co/48x48.png`} data-ai-hint="profile portrait"/>
-                <AvatarFallback>{member.avatar}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="font-medium">{member.name}</p>
-                <p className="text-sm text-muted-foreground">{member.id}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <p className="text-muted-foreground">User registration and team management features are coming soon!</p>
       </CardContent>
     </Card>
   );
