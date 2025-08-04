@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, LogOut, MessageSquare, Shield, User } from 'lucide-react';
+import { LayoutDashboard, LogOut, MessageSquare, Newspaper, Shield, User } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -46,6 +46,18 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 <Link href="/dashboard">
                   <LayoutDashboard />
                   Dashboard
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/posts'}
+                tooltip="Posts"
+              >
+                <Link href="/posts">
+                  <Newspaper />
+                  Posts
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -104,6 +116,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className='flex-1'>
               <h1 className='font-semibold text-lg'>
                 {pathname === '/dashboard' && 'Dashboard'}
+                {pathname === '/posts' && 'Posts'}
                 {pathname === '/chat' && 'Chat'}
                 {pathname === '/profile' && 'Profile'}
                 {pathname === '/admin' && 'Admin Dashboard'}

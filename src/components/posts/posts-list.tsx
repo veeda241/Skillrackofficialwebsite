@@ -1,0 +1,135 @@
+'use client';
+
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, Terminal, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Skeleton } from '../ui/skeleton';
+import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
+import type { Post } from '@/app/types/posts';
+import { fetchPosts } from '@/app/actions/posts';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { AddPostForm } from './add-post-form';
+import { format } from 'date-fns';
+import { Avatar, AvatarFallback } from '../ui/avatar';
+
+
+const getInitials = (name: string) => {
+    const names = name.split(' ');
+    if (names.length > 1) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+}
+
+
+function PostCard({ post }: { post: Post }) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>{post.title}</CardTitle>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
+                    <Avatar className="h-6 w-6">
+                        <AvatarFallback>{getInitials(post.authorName)}</AvatarFallback>
+                    </Avatar>
+                    <span>{post.authorName}</span>
+                    <span>&middot;</span>
+                    <time dateTime={post.createdAt}>
+                        {format(new Date(post.createdAt), "PPP")}
+                    </time>
+                </div>
+            </CardHeader>
+            <CardContent>
+                <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
+            </CardContent>
+        </Card>
+    );
+}
+
+export function PostsList() {
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const getPosts = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await fetchPosts();
+      if (result.success && result.data) {
+        setPosts(result.data.posts);
+      } else {
+        setError(result.error || 'Failed to fetch posts.');
+      }
+    } catch (e) {
+      setError('An unexpected error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getPosts();
+  }, []);
+
+  const handlePostAdded = () => {
+    setIsFormOpen(false);
+    getPosts(); // Refresh the list
+  }
+
+  return (
+    <div className="space-y-6">
+        <div className="flex justify-between items-center">
+            <div>
+                <h1 className="text-2xl font-bold">Community Posts</h1>
+                <p className="text-muted-foreground">Browse the latest tech blogs and updates from the community.</p>
+            </div>
+            <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+                <DialogTrigger asChild>
+                    <Button>
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Add Post
+                    </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[625px]">
+                    <DialogHeader>
+                        <DialogTitle>Create a New Post</DialogTitle>
+                        <DialogDescription>
+                           Share your thoughts, a tech discovery, or an update with the community.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <AddPostForm onPostAdded={handlePostAdded} />
+                </DialogContent>
+            </Dialog>
+        </div>
+        
+        {isLoading && (
+            <div className="space-y-4">
+                <Skeleton className="h-40 w-full" />
+                <Skeleton className="h-40 w-full" />
+            </div>
+        )}
+        {error && (
+            <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+        {!isLoading && !error && posts.length === 0 && (
+            <div className="text-center text-muted-foreground py-12 border-2 border-dashed rounded-lg">
+                <p className="text-lg font-medium">No posts yet.</p>
+                <p>Be the first one to share something!</p>
+            </div>
+        )}
+        {!isLoading && !error && posts.length > 0 && (
+            <div className="space-y-4">
+                {posts.map((post) => (
+                    <PostCard key={post.id} post={post} />
+                ))}
+            </div>
+        )}
+    </div>
+  );
+}
