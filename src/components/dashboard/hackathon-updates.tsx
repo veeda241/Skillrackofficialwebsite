@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Briefcase, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import type { Hackathon } from '@/ai/flows/hackathon-updates';
 import { fetchHackathonUpdates } from '@/app/actions/hackathons';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
+import type { Hackathon } from '@/app/types/hackathon-updates';
 
 function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
   return (

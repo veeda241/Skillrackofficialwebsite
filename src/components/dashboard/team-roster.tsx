@@ -18,7 +18,7 @@ export function TeamRoster() {
         <CardTitle>Team Roster</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground">User registration and team management features are coming soon!</p>
+        <p className="text-muted-foreground">User registration and team management features are coming soon. The team roster will be displayed here.</p>
       </CardContent>
     </Card>
   );
