@@ -8,6 +8,8 @@ export const HackathonSchema = z.object({
   date: z
     .string()
     .describe('The date of the event, formatted as "Month Day-Day, Year".'),
+  imageUrl: z.string().url().describe('A relevant image URL for the hackathon.'),
+  imageHint: z.string().describe('A one or two word hint for the image subject matter.')
 });
 export type Hackathon = z.infer<typeof HackathonSchema>;
 

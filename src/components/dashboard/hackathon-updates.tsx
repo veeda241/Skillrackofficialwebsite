@@ -18,10 +18,10 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
           <Image
             alt={hackathon.title}
             className="h-48 w-full object-cover md:w-48"
-            src="https://placehold.co/600x400.png"
+            src={hackathon.imageUrl}
             width={200}
             height={200}
-            data-ai-hint="technology conference"
+            data-ai-hint={hackathon.imageHint}
           />
         </div>
         <div className="p-6 flex flex-col justify-between">

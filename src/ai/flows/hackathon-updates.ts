@@ -22,7 +22,7 @@ const prompt = ai.definePrompt({
   name: 'hackathonUpdatesPrompt',
   output: { schema: HackathonUpdatesOutputSchema },
   tools: [inTheKnowTool],
-  prompt: `You are an event coordinator for the AI/ML community. Generate a list of 3 upcoming, fictional but realistic-sounding hackathon events. The events should be compelling and sound like real opportunities for developers. Use the inTheKnowTool to get the latest information about real-world hackathons.`,
+  prompt: `You are an event coordinator for the AI/ML community. Generate a list of 3 upcoming, fictional but realistic-sounding hackathon events. The events should be compelling and sound like real opportunities for developers. For each event, provide a title, a short description, dates, a placeholder image URL from placehold.co, and a 1-2 word hint for the image. Use the inTheKnowTool to get the latest information about real-world hackathons.`,
 });
 
 const hackathonUpdatesFlow = ai.defineFlow(
