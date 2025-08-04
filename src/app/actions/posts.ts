@@ -40,3 +40,18 @@ export async function addPost(post: Omit<Post, 'id' | 'createdAt'>): Promise<{ s
         return { success: false, error: errorMessage };
     }
 }
+
+export async function removePost(postId: string): Promise<{ success: true } | { success: false; error: string }> {
+    try {
+        const index = allPosts.findIndex((p) => p.id === postId);
+        if (index > -1) {
+            allPosts.splice(index, 1);
+        }
+        revalidatePath('/posts');
+        return { success: true };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return { success: false, error: errorMessage };
+    }
+}

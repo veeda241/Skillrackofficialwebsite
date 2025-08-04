@@ -2,16 +2,17 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Terminal, User } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { PlusCircle, Terminal, Trash2, User } from 'lucide-react';
+import { useEffect, useState, useTransition } from 'react';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Post } from '@/app/types/posts';
-import { fetchPosts } from '@/app/actions/posts';
+import { fetchPosts, removePost } from '@/app/actions/posts';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { AddPostForm } from './add-post-form';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback } from '../ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 
 
 const getInitials = (name: string) => {
@@ -23,7 +24,15 @@ const getInitials = (name: string) => {
 }
 
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, onRemove }: { post: Post, onRemove: (id: string) => void }) {
+    const [isPending, startTransition] = useTransition();
+    
+    const handleRemove = () => {
+        startTransition(() => {
+            onRemove(post.id);
+        });
+    };
+
     return (
         <Card>
             <CardHeader>
@@ -42,6 +51,12 @@ function PostCard({ post }: { post: Post }) {
             <CardContent>
                 <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
             </CardContent>
+            <CardFooter>
+                 <Button variant="destructive" size="sm" onClick={handleRemove} disabled={isPending}>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {isPending ? 'Removing...' : 'Remove'}
+                </Button>
+            </CardFooter>
         </Card>
     );
 }
@@ -51,6 +66,7 @@ export function PostsList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const { toast } = useToast();
 
   const getPosts = async () => {
     setIsLoading(true);
@@ -77,6 +93,24 @@ export function PostsList() {
     setIsFormOpen(false);
     getPosts(); // Refresh the list
   }
+
+  const handleRemovePost = async (id: string) => {
+    const result = await removePost(id);
+    if (result.success) {
+      toast({
+        title: 'Success',
+        description: 'Post removed successfully.',
+      });
+      // Refresh the list from the server
+      getPosts();
+    } else {
+      toast({
+        title: 'Error',
+        description: result.error,
+        variant: 'destructive'
+      });
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -126,7 +160,7 @@ export function PostsList() {
         {!isLoading && !error && posts.length > 0 && (
             <div className="space-y-4">
                 {posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
+                    <PostCard key={post.id} post={post} onRemove={handleRemovePost} />
                 ))}
             </div>
         )}
