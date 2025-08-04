@@ -9,6 +9,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Hackathon } from '@/app/types/hackathon-updates';
 import Link from 'next/link';
+import { fetchHackathonUpdates } from '@/app/actions/hackathons';
 
 function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
   return (
@@ -49,6 +50,29 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
 }
 
 export function HackathonUpdates() {
+  const [updates, setUpdates] = useState<Hackathon[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUpdates = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await fetchHackathonUpdates();
+        if (result.success && result.data) {
+          setUpdates(result.data.hackathons);
+        } else {
+          setError(result.error || 'Failed to fetch hackathon updates.');
+        }
+      } catch (e) {
+        setError('An unexpected error occurred.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getUpdates();
+  }, []);
 
   return (
     <Card className="shadow-lg">
@@ -57,10 +81,32 @@ export function HackathonUpdates() {
         <CardTitle>Hackathon Updates</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-center text-muted-foreground py-8">
-            <p>No hackathons have been posted yet.</p>
-            <p className="text-sm">Check back later for updates!</p>
-        </div>
+        {isLoading && (
+            <div className="space-y-4">
+                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-48 w-full" />
+            </div>
+        )}
+        {error && (
+            <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+        {!isLoading && !error && updates.length === 0 && (
+            <div className="text-center text-muted-foreground py-8">
+                <p>No hackathons have been posted yet.</p>
+                <p className="text-sm">Check back later for updates!</p>
+            </div>
+        )}
+        {!isLoading && !error && updates.length > 0 && (
+            <div className="space-y-4">
+                {updates.map((hackathon, index) => (
+                    <HackathonCard key={index} hackathon={hackathon} />
+                ))}
+            </div>
+        )}
       </CardContent>
     </Card>
   );
