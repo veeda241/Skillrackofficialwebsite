@@ -42,7 +42,7 @@ export default function AdminHackathonsPage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6" suppressHydrationWarning>
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Add New Hackathon</CardTitle>
