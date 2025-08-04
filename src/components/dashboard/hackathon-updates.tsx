@@ -9,6 +9,7 @@ import { fetchHackathonUpdates } from '@/app/actions/hackathons';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Hackathon } from '@/app/types/hackathon-updates';
+import Link from 'next/link';
 
 function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
   return (
@@ -30,8 +31,17 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
             <CardDescription className="mt-1">{hackathon.date}</CardDescription>
             <p className="mt-4 text-muted-foreground">{hackathon.description}</p>
           </div>
-          <div className="mt-4">
-            <Button variant="outline">Learn More</Button>
+          <div className="mt-4 flex gap-2">
+            <Button asChild>
+                <Link href={hackathon.url} target="_blank" rel="noopener noreferrer">
+                    Register
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href={hackathon.url} target="_blank" rel="noopener noreferrer">
+                    Learn More
+                </Link>
+            </Button>
           </div>
         </div>
       </div>
