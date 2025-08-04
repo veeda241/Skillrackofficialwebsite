@@ -11,7 +11,7 @@ import { fetchPosts, removePost } from '@/app/actions/posts';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { AddPostForm } from './add-post-form';
 import { format } from 'date-fns';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 
 
@@ -36,16 +36,21 @@ function PostCard({ post, onRemove }: { post: Post, onRemove: (id: string) => vo
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{post.title}</CardTitle>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2">
-                    <Avatar className="h-6 w-6">
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                        <AvatarImage src={post.authorImage} alt={post.authorName} />
                         <AvatarFallback>{getInitials(post.authorName)}</AvatarFallback>
                     </Avatar>
-                    <span>{post.authorName}</span>
-                    <span>&middot;</span>
-                    <time dateTime={post.createdAt}>
-                        {format(new Date(post.createdAt), "PPP")}
-                    </time>
+                    <div>
+                        <CardTitle>{post.title}</CardTitle>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground pt-1">
+                            <span>{post.authorName}</span>
+                            <span>&middot;</span>
+                            <time dateTime={post.createdAt}>
+                                {format(new Date(post.createdAt), "PPP")}
+                            </time>
+                        </div>
+                    </div>
                 </div>
             </CardHeader>
             <CardContent>

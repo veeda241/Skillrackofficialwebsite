@@ -41,7 +41,8 @@ export function AddPostForm({ onPostAdded }: AddPostFormProps) {
     // In a real app, you'd get the author name from the current user's session
     const newPost = {
       ...values,
-      authorName: 'Ada Lovelace', 
+      authorName: 'Ada Lovelace',
+      authorImage: `https://placehold.co/100x100.png`,
     };
 
     const result = await addPost(newPost);

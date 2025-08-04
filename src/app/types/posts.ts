@@ -5,6 +5,7 @@ export const PostSchema = z.object({
   title: z.string(),
   content: z.string(),
   authorName: z.string(),
+  authorImage: z.string().optional(),
   createdAt: z.string(),
 });
 
