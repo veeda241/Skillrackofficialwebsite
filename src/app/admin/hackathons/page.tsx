@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { addHackathon } from '@/app/actions/hackathons.js';
+import { addHackathon } from '@/app/actions/hackathons';
 import { useRouter } from 'next/navigation';
 
 const hackathonFormSchema = z.object({
@@ -59,7 +59,7 @@ export default function AdminHackathonsPage() {
   }
 
   return (
-    <div className="grid gap-6" suppressHydrationWarning>
+    <div className="grid gap-6">
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Add New Hackathon</CardTitle>
