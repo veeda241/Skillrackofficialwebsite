@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { GraduationCap, LayoutDashboard, Lightbulb, LogOut, Shield } from 'lucide-react';
+import { GraduationCap, LayoutDashboard, LogOut, Shield } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -51,18 +51,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenuItem>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === '/recommendations'}
-                tooltip="Recommendations"
-              >
-                <Link href="/recommendations">
-                  <Lightbulb />
-                  Recommendations
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
                 isActive={pathname.startsWith('/admin')}
                 tooltip="Admin"
               >
@@ -91,7 +79,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <div className='flex-1'>
               <h1 className='font-semibold text-lg'>
                 {pathname === '/dashboard' && 'Dashboard'}
-                {pathname === '/recommendations' && 'Course Recommendations'}
                 {pathname === '/admin/hackathons' && 'Admin: Manage Hackathons'}
               </h1>
             </div>

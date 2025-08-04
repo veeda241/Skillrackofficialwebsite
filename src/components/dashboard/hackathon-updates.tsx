@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Briefcase, Terminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchHackathonUpdates } from '@/app/actions/hackathons';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Hackathon } from '@/app/types/hackathon-updates';
@@ -49,49 +48,7 @@ function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
   );
 }
 
-function LoadingSkeleton() {
-    return (
-        <div className="space-y-6">
-            {[...Array(2)].map((_, i) => (
-                <Card key={i} className="overflow-hidden">
-                    <div className="md:flex">
-                        <div className="md:flex-shrink-0">
-                            <Skeleton className="h-48 w-full md:w-48" />
-                        </div>
-                        <div className="p-6 flex-1">
-                            <Skeleton className="h-6 w-3/4 mb-2" />
-                            <Skeleton className="h-4 w-1/4 mb-4" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-5/6 mt-2" />
-                             <div className="mt-4">
-                               <Skeleton className="h-10 w-28" />
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            ))}
-        </div>
-    )
-}
-
 export function HackathonUpdates() {
-  const [hackathons, setHackathons] = useState<Hackathon[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function loadHackathons() {
-      setIsLoading(true);
-      const result = await fetchHackathonUpdates();
-      if (result.success && result.data) {
-        setHackathons(result.data.hackathons);
-      } else {
-        setError(result.error || 'Failed to fetch hackathon updates.');
-      }
-      setIsLoading(false);
-    }
-    loadHackathons();
-  }, []);
 
   return (
     <Card className="shadow-lg">
@@ -100,21 +57,10 @@ export function HackathonUpdates() {
         <CardTitle>Hackathon Updates</CardTitle>
       </CardHeader>
       <CardContent>
-        {isLoading && <LoadingSkeleton />}
-        {error && (
-            <Alert variant="destructive">
-                <Terminal className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-            </Alert>
-        )}
-        {!isLoading && !error && (
-            <div className="space-y-6">
-                {hackathons.map((hackathon) => (
-                    <HackathonCard key={hackathon.title} hackathon={hackathon} />
-                ))}
-            </div>
-        )}
+        <div className="text-center text-muted-foreground py-8">
+            <p>No hackathons have been posted yet.</p>
+            <p className="text-sm">Check back later for updates!</p>
+        </div>
       </CardContent>
     </Card>
   );

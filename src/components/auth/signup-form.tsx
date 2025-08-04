@@ -17,7 +17,7 @@ const formSchema = z.object({
   password: z.string().min(8, { message: 'Password must be at least 8 characters.' }),
 });
 
-export function SignupForm() {
+export function SignupForm({ isAdmin = false }: { isAdmin?: boolean }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -32,7 +32,7 @@ export function SignupForm() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    console.log(values);
+    console.log({ ...values, role: isAdmin ? 'admin' : 'member' });
     // Simulate signup
     setTimeout(() => {
         router.push('/dashboard');
@@ -42,7 +42,7 @@ export function SignupForm() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>Sign Up</CardTitle>
+        <CardTitle>{isAdmin ? 'Admin Sign Up' : 'Sign Up'}</CardTitle>
         <CardDescription>It's quick and easy to get started.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -55,7 +55,7 @@ export function SignupForm() {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ada Lovelace" {...field} />
+                    <Input placeholder="Ada Lovelace" {...field} suppressHydrationWarning />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -68,7 +68,7 @@ export function SignupForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
+                    <Input placeholder="name@example.com" {...field} suppressHydrationWarning />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -81,7 +81,7 @@ export function SignupForm() {
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input type="password" placeholder="••••••••" {...field} suppressHydrationWarning />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

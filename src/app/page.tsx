@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCap, Briefcase, Lightbulb, Users } from 'lucide-react';
+import { GraduationCap, Briefcase, Lightbulb, Users, ShieldCheck } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -27,10 +27,10 @@ export default function Home() {
         <section className="py-12 md:py-24 lg:py-32">
           <div className="container px-4 text-center">
             <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl font-headline">
-              Level Up Your AI/ML Skills
+              Discover Your Next Hackathon
             </h1>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed mt-4">
-              SkillRack provides personalized course recommendations, connects you with your team, and keeps you updated on the latest hackathons.
+              SkillRack is your central hub for finding exciting hackathons, connecting with your team, and tracking your journey.
             </p>
             <div className="mt-6">
               <Button size="lg" asChild style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>
@@ -44,20 +44,11 @@ export default function Home() {
           <div className="container grid gap-8 md:grid-cols-3">
             <Card className="border-none shadow-lg">
               <CardHeader className="flex flex-row items-center gap-4">
-                <Lightbulb className="h-8 w-8 text-primary" />
-                <CardTitle>AI-Powered Recommendations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">Get course suggestions in the AI/ML domain tailored to your profile and goals, helping you learn what matters most.</p>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-lg">
-              <CardHeader className="flex flex-row items-center gap-4">
                 <Briefcase className="h-8 w-8 text-primary" />
-                <CardTitle>Hackathon Updates</CardTitle>
+                <CardTitle>Curated Hackathon Updates</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Stay ahead of the curve with a curated feed of the latest and most exciting hackathon competitions.</p>
+                <p className="text-muted-foreground">Stay ahead of the curve with a curated feed of the latest and most exciting hackathon competitions, managed by our admins.</p>
               </CardContent>
             </Card>
             <Card className="border-none shadow-lg">
@@ -67,6 +58,15 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">View your team's roster and progress, fostering a collaborative environment for your hackathon journey.</p>
+              </CardContent>
+            </Card>
+            <Card className="border-none shadow-lg">
+              <CardHeader className="flex flex-row items-center gap-4">
+                <ShieldCheck className="h-8 w-8 text-primary" />
+                <CardTitle>Admin-Managed Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Admins can easily add and manage hackathon listings to ensure the community gets the best information.</p>
               </CardContent>
             </Card>
           </div>
