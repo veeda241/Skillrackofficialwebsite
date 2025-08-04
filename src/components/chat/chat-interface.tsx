@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send } from 'lucide-react';
-import { getChatResponse } from '@/app/actions/chat';
+import { Send, User } from 'lucide-react';
+import { getChatMessages, sendChatMessage } from '@/app/actions/chat';
 
 const chatFormSchema = z.object({
   message: z.string().min(1, { message: 'Message cannot be empty.' }),
@@ -25,6 +25,7 @@ type Message = {
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof chatFormSchema>>({
     resolver: zodResolver(chatFormSchema),
@@ -33,65 +34,58 @@ export function ChatInterface() {
     },
   });
 
+  const fetchMessages = async () => {
+    setError(null);
+    const result = await getChatMessages();
+    if (result.success) {
+      setMessages(result.data);
+    } else {
+      setError(result.error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessages();
+    // Set up polling to refresh messages every 3 seconds
+    const interval = setInterval(fetchMessages, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   async function onSubmit(values: z.infer<typeof chatFormSchema>) {
     setIsLoading(true);
-    const userMessage: Message = { role: 'user', content: values.message };
-    setMessages((prev) => [...prev, userMessage]);
-    form.reset();
-
-    const result = await getChatResponse({ message: values.message });
-
-    if (result.success && result.data) {
-      const assistantMessage: Message = { role: 'assistant', content: result.data.response };
-      setMessages((prev) => [...prev, assistantMessage]);
+    
+    const result = await sendChatMessage(values.message);
+    if (result.success) {
+        form.reset();
+        await fetchMessages(); // Immediately fetch messages after sending
     } else {
-      const errorMessage: Message = { role: 'assistant', content: `Error: ${result.error}` };
-      setMessages((prev) => [...prev, errorMessage]);
+      setError(result.error);
     }
+
     setIsLoading(false);
   }
 
   return (
     <Card className="h-[calc(100vh-8rem)] flex flex-col shadow-lg">
       <CardHeader>
-        <CardTitle>AI Chat Assistant</CardTitle>
+        <CardTitle>Global Chat Room</CardTitle>
+        <CardDescription>Talk with other users in real-time.</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
         <ScrollArea className="h-full pr-4">
           <div className="space-y-4">
             {messages.map((message, index) => (
-              <div key={index} className={`flex items-start gap-3 ${message.role === 'user' ? 'justify-end' : ''}`}>
-                {message.role === 'assistant' && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>AI</AvatarFallback>
-                  </Avatar>
-                )}
-                <div className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
+              <div key={index} className={`flex items-start gap-3`}>
+                <Avatar className="h-8 w-8">
+                   <AvatarFallback>{message.role === 'assistant' ? 'AI' : 'U'}</AvatarFallback>
+                </Avatar>
+                <div className={`rounded-lg px-4 py-2 max-w-[80%] bg-muted`}>
                   <p className="text-sm">{message.content}</p>
                 </div>
-                {message.role === 'user' && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                )}
               </div>
             ))}
-             {isLoading && (
-              <div className="flex items-start gap-3">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-                <div className="rounded-lg px-4 py-2 bg-muted">
-                  <p className="text-sm">Thinking...</p>
-                </div>
-              </div>
-            )}
           </div>
+          {error && <p className="text-destructive text-sm mt-4">{error}</p>}
         </ScrollArea>
       </CardContent>
       <CardFooter className="pt-4 border-t">
