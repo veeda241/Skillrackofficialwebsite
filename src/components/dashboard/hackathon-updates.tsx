@@ -11,7 +11,6 @@ import type { Hackathon } from '@/app/types/hackathon-updates';
 import Link from 'next/link';
 import { fetchHackathonUpdates, removeHackathon } from '@/app/actions/hackathons';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 function HackathonCard({ hackathon, onRemove }: { hackathon: Hackathon, onRemove: (id: string) => void }) {
   const [isPending, startTransition] = useTransition();
@@ -68,7 +67,6 @@ export function HackathonUpdates() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const router = useRouter();
 
   const getUpdates = async () => {
     setIsLoading(true);
