@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { addHackathon } from '@/app/actions/hackathons';
+import { useRouter } from 'next/navigation';
 
 const hackathonFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }),
@@ -19,6 +21,7 @@ const hackathonFormSchema = z.object({
 
 export default function AdminHackathonsPage() {
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof hackathonFormSchema>>({
     resolver: zodResolver(hackathonFormSchema),
@@ -30,15 +33,29 @@ export default function AdminHackathonsPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof hackathonFormSchema>) {
-    console.log(values);
-    // In a real application, you would send this to your backend to save.
-    // For now, we'll just show a success message.
-    toast({
-      title: 'Hackathon Submitted!',
-      description: `${values.title} has been added.`,
-    });
-    form.reset();
+  async function onSubmit(values: z.infer<typeof hackathonFormSchema>) {
+    const newHackathon = {
+        ...values,
+        imageUrl: `https://placehold.co/600x400.png`,
+        imageHint: 'custom event'
+    };
+    
+    const result = await addHackathon(newHackathon);
+
+    if (result.success) {
+        toast({
+            title: 'Hackathon Submitted!',
+            description: `${values.title} has been added.`,
+        });
+        form.reset();
+        router.push('/dashboard');
+    } else {
+        toast({
+            title: 'Error',
+            description: result.error,
+            variant: 'destructive'
+        });
+    }
   }
 
   return (
@@ -60,7 +77,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Hackathon Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., AI for Social Good Hackathon" {...field} />
+                      <Input placeholder="e.g., AI for Social Good Hackathon" {...field} suppressHydrationWarning />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -73,7 +90,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., October 26-28, 2024" {...field} />
+                      <Input placeholder="e.g., October 26-28, 2024" {...field} suppressHydrationWarning />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -86,7 +103,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Registration URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/hackathon" {...field} />
+                      <Input placeholder="https://example.com/hackathon" {...field} suppressHydrationWarning />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,6 +120,7 @@ export default function AdminHackathonsPage() {
                         placeholder="Describe the hackathon, its goals, and what participants can expect."
                         className="min-h-[100px]"
                         {...field}
+                        suppressHydrationWarning
                       />
                     </FormControl>
                     <FormMessage />
