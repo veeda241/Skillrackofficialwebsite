@@ -9,7 +9,7 @@ import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import type { Hackathon } from '@/app/types/hackathon-updates';
 import Link from 'next/link';
-import { fetchHackathonUpdates } from '@/app/actions/hackathons';
+import { fetchHackathonUpdates } from '@/app/actions/hackathons.js';
 
 function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
   return (

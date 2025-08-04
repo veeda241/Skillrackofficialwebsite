@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { addHackathon } from '@/app/actions/hackathons';
+import { addHackathon } from '@/app/actions/hackathons.js';
 import { useRouter } from 'next/navigation';
 
 const hackathonFormSchema = z.object({
@@ -59,7 +59,7 @@ export default function AdminHackathonsPage() {
   }
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-6" suppressHydrationWarning>
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle>Add New Hackathon</CardTitle>
@@ -77,7 +77,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Hackathon Title</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., AI for Social Good Hackathon" {...field} suppressHydrationWarning />
+                      <Input placeholder="e.g., AI for Social Good Hackathon" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,7 +90,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., October 26-28, 2024" {...field} suppressHydrationWarning />
+                      <Input placeholder="e.g., October 26-28, 2024" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -103,7 +103,7 @@ export default function AdminHackathonsPage() {
                   <FormItem>
                     <FormLabel>Registration URL</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/hackathon" {...field} suppressHydrationWarning />
+                      <Input placeholder="https://example.com/hackathon" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -120,7 +120,6 @@ export default function AdminHackathonsPage() {
                         placeholder="Describe the hackathon, its goals, and what participants can expect."
                         className="min-h-[100px]"
                         {...field}
-                        suppressHydrationWarning
                       />
                     </FormControl>
                     <FormMessage />
