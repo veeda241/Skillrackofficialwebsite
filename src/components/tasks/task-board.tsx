@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useTransition } from 'react';
 import type { Column, Task } from '@/app/types/tasks';
-import { fetchTasks, updateTaskStatus } from '@/app/actions/tasks';
+import { fetchTasks, updateTaskStatus, removeTask } from '@/app/actions/tasks';
 import { Skeleton } from '../ui/skeleton';
 import { Alert, AlertTitle, AlertDescription } from '../ui/alert';
 import { Terminal } from 'lucide-react';
@@ -21,12 +21,14 @@ import { arrayMove } from '@dnd-kit/sortable';
 import { TaskCard } from './task-card';
 import { createPortal } from 'react-dom';
 import type { User } from '@/lib/users';
+import { useToast } from '@/hooks/use-toast';
 
 export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
   const [columns, setColumns] = useState<Column[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const { toast } = useToast();
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -58,6 +60,24 @@ export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
   useEffect(() => {
     getTasks();
   }, []);
+
+  const handleRemoveTask = async (taskId: string) => {
+    const result = await removeTask(taskId);
+    if(result.success) {
+      toast({
+        title: 'Task Removed',
+        description: 'The task has been successfully deleted.'
+      });
+      getTasks();
+    } else {
+      toast({
+        title: 'Error',
+        description: result.error,
+        variant: 'destructive',
+      });
+    }
+  }
+
 
   const onDragStart = (event: DragStartEvent) => {
     if (event.active.data.current?.type === 'Task') {
@@ -229,13 +249,14 @@ export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
               key={column.id}
               column={column}
               onTaskAdded={getTasks}
+              onRemoveTask={handleRemoveTask}
               user={user}
             />
           ))}
       </div>
       {typeof document !== "undefined" && createPortal(
         <DragOverlay>
-          {activeTask && <TaskCard task={activeTask} />}
+          {activeTask && <TaskCard task={activeTask} onRemove={() => {}} />}
         </DragOverlay>,
         document.body
       )}

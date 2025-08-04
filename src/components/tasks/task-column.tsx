@@ -7,7 +7,14 @@ import { TaskCard } from "./task-card";
 import { AddTaskForm } from './add-task-form';
 import type { User } from '@/lib/users';
 
-export function TaskColumn({ column, onTaskAdded, user }: { column: Column; onTaskAdded: () => void; user: Omit<User, 'password'> | null; }) {
+type TaskColumnProps = { 
+    column: Column; 
+    onTaskAdded: () => void; 
+    onRemoveTask: (id: string) => void;
+    user: Omit<User, 'password'> | null; 
+}
+
+export function TaskColumn({ column, onTaskAdded, onRemoveTask, user }: TaskColumnProps) {
     const tasksIds = useMemo(() => {
         return column.tasks.map((task) => task.id);
     }, [column.tasks]);
@@ -37,7 +44,7 @@ export function TaskColumn({ column, onTaskAdded, user }: { column: Column; onTa
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto rounded-lg bg-muted/50 p-2 min-h-40">
                 <SortableContext items={tasksIds}>
                     {column.tasks.map((task) => (
-                        <TaskCard key={task.id} task={task} />
+                        <TaskCard key={task.id} task={task} onRemove={onRemoveTask} />
                     ))}
                 </SortableContext>
                  {column.tasks.length === 0 && (

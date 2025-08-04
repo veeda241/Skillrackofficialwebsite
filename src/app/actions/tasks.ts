@@ -76,3 +76,19 @@ export async function updateTaskStatus(
     return { success: false, error: errorMessage };
   }
 }
+
+export async function removeTask(taskId: string): Promise<{ success: true } | { success: false; error: string }> {
+    try {
+        const index = allTasks.findIndex((t) => t.id === taskId);
+        if (index > -1) {
+            allTasks.splice(index, 1);
+            revalidatePath('/tasks');
+            return { success: true };
+        }
+        return { success: false, error: 'Task not found.' };
+    } catch (e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return { success: false, error: errorMessage };
+    }
+}
