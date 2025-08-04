@@ -1,6 +1,9 @@
 import { LoginForm } from '@/components/auth/login-form';
 import { Logo } from '@/components/logo';
 import Link from 'next/link';
+import { RecommendedAccounts } from '@/components/auth/recommended-accounts';
+import { Separator } from '@/components/ui/separator';
+import { login } from '@/app/actions/auth';
 
 export default function LoginPage() {
   return (
@@ -12,9 +15,19 @@ export default function LoginPage() {
                 <span className="text-2xl font-headline">SkillRack</span>
             </Link>
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-          <p className="text-muted-foreground">Enter your credentials to access your account.</p>
+          <p className="text-muted-foreground">Choose an account or sign in below.</p>
         </div>
-        <LoginForm />
+        
+        <RecommendedAccounts onLogin={login} />
+
+        <div className="my-6 flex items-center">
+            <Separator className="flex-1" />
+            <span className="px-4 text-xs text-muted-foreground">OR</span>
+            <Separator className="flex-1" />
+        </div>
+
+        <LoginForm onLogin={login} />
+
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link href="/signup" className="font-medium text-primary hover:underline">

@@ -10,14 +10,20 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email.' }),
   password: z.string().min(1, { message: 'Password is required.' }),
 });
 
-export function LoginForm() {
+type LoginFormProps = {
+    onLogin: (values: z.infer<typeof formSchema>) => Promise<{ success: boolean; error?: string }>;
+}
+
+export function LoginForm({ onLogin }: LoginFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -28,20 +34,27 @@ export function LoginForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    console.log(values);
-    // Simulate login
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 1000);
+    
+    const result = await onLogin(values);
+
+    if (result.success) {
+        router.push('/dashboard');
+    } else {
+        toast({
+            title: 'Login Failed',
+            description: result.error,
+            variant: 'destructive'
+        });
+    }
+    setIsSubmitting(false);
   }
 
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
-        <CardDescription>Use your email and password to login.</CardDescription>
+        <CardTitle>Sign in with email</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
