@@ -66,7 +66,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 isActive={pathname.startsWith('/admin')}
                 tooltip="Admin"
               >
-                <Link href="/admin/hackathons">
+                <Link href="/admin">
                   <Shield />
                   Admin
                 </Link>
@@ -92,6 +92,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <h1 className='font-semibold text-lg'>
                 {pathname === '/dashboard' && 'Dashboard'}
                 {pathname === '/profile' && 'Profile'}
+                {pathname === '/admin' && 'Admin Dashboard'}
                 {pathname === '/admin/hackathons' && 'Admin: Manage Hackathons'}
               </h1>
             </div>
