@@ -1,8 +1,12 @@
+'use client';
+
 import { Task } from "@/app/types/tasks";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const getInitials = (name: string) => {
     const names = name.split(' ');
@@ -19,8 +23,44 @@ const priorityClasses: Record<Task['priority'], string> = {
 };
 
 export function TaskCard({ task }: { task: Task }) {
+    const {
+        setNodeRef,
+        attributes,
+        listeners,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
+        id: task.id,
+        data: {
+            type: "Task",
+            task,
+        },
+    });
+
+    const style = {
+        transition,
+        transform: CSS.Transform.toString(transform),
+    };
+
+    if (isDragging) {
+        return (
+            <div
+                ref={setNodeRef}
+                style={style}
+                className="h-[100px] w-full rounded-lg border-2 border-primary bg-card"
+            />
+        );
+    }
+
     return (
-        <Card className="cursor-grab active:cursor-grabbing">
+        <Card 
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing touch-none"
+        >
             <CardHeader className="p-4">
                 <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{task.title}</h3>
