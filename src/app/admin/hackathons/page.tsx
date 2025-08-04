@@ -45,7 +45,7 @@ export default function AdminHackathonsPage() {
     if (result.success) {
         toast({
             title: 'Hackathon Submitted!',
-            description: `${values.title} has been added and the dashboard has been updated.`,
+            description: `${values.title} has been added. Redirecting to dashboard...`,
         });
         form.reset();
         router.push('/dashboard');

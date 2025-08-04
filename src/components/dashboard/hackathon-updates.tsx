@@ -97,7 +97,7 @@ export function HackathonUpdates() {
         {!isLoading && !error && updates.length === 0 && (
             <div className="text-center text-muted-foreground py-8">
                 <p>No hackathons have been posted yet.</p>
-                <p className="text-sm">Check back later for updates!</p>
+                <p className="text-sm">Admins can add hackathons using the Admin panel.</p>
             </div>
         )}
         {!isLoading && !error && updates.length > 0 && (
