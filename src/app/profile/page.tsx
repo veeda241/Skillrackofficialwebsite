@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { ConnectedAppIcon } from './connected-app-icon';
 
 const profileFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -53,23 +55,35 @@ export default function ProfilePage() {
     <div className="grid gap-6">
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Profile Customization</CardTitle>
+          <CardTitle>Profile</CardTitle>
           <CardDescription>
-            Update your profile information and avatar.
+            This is how others will see you on the site.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24">
                   <AvatarImage src={avatarPreview} alt="User Avatar" />
                   <AvatarFallback>AL</AvatarFallback>
                 </Avatar>
-                <div className="grid gap-1.5">
-                    <FormLabel htmlFor="avatar-upload">Profile Picture</FormLabel>
-                    <Input id="avatar-upload" type="file" className="w-full" onChange={handleAvatarChange} />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="avatar"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          className="max-w-xs"
+                          onChange={handleAvatarChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
               <FormField
@@ -101,11 +115,52 @@ export default function ProfilePage() {
               />
 
               <Button type="submit" style={{ backgroundColor: 'hsl(var(--accent))', color: 'hsl(var(--accent-foreground))' }}>
-                Save Changes
+                Update Profile
               </Button>
             </form>
           </Form>
         </CardContent>
+      </Card>
+
+      <Card className="shadow-lg">
+          <CardHeader>
+              <CardTitle>Connected Apps</CardTitle>
+              <CardDescription>Manage your third-party app connections.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <ConnectedAppIcon app="github" />
+                    <div>
+                        <p className="font-medium">GitHub</p>
+                        <p className="text-sm text-muted-foreground">Code hosting and version control</p>
+                    </div>
+                </div>
+                <Button variant="outline">Connect</Button>
+            </div>
+            <Separator />
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <ConnectedAppIcon app="devpost" />
+                    <div>
+                        <p className="font-medium">Devpost</p>
+                        <p className="text-sm text-muted-foreground">Hackathon platform</p>
+                    </div>
+                </div>
+                <Button variant="outline">Connect</Button>
+            </div>
+             <Separator />
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <ConnectedAppIcon app="slack" />
+                    <div>
+                        <p className="font-medium">Slack</p>
+                        <p className="text-sm text-muted-foreground">Team communication</p>
+                    </div>
+                </div>
+                <Button variant="outline">Connect</Button>
+            </div>
+          </CardContent>
       </Card>
     </div>
   );
