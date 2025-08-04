@@ -11,6 +11,7 @@ import { addTask } from '@/app/actions/tasks';
 import type { Task } from '@/app/types/tasks';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import type { User } from '@/lib/users';
 
 const taskFormSchema = z.object({
   title: z.string().min(1, { message: 'Title is required.' }),
@@ -19,9 +20,10 @@ const taskFormSchema = z.object({
 type AddTaskFormProps = {
   status: Task['status'];
   onTaskAdded: () => void;
+  user: Omit<User, 'password'> | null;
 };
 
-export function AddTaskForm({ status, onTaskAdded }: AddTaskFormProps) {
+export function AddTaskForm({ status, onTaskAdded, user }: AddTaskFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -33,8 +35,17 @@ export function AddTaskForm({ status, onTaskAdded }: AddTaskFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof taskFormSchema>) {
+    if (!user) {
+        toast({
+            title: 'Error',
+            description: 'You must be logged in to add a task.',
+            variant: 'destructive',
+        });
+        return;
+    }
+
     setIsSubmitting(true);
-    const result = await addTask({ ...values, status });
+    const result = await addTask({ ...values, status, creator: user.name });
 
     if (result.success) {
       toast({
@@ -62,7 +73,7 @@ export function AddTaskForm({ status, onTaskAdded }: AddTaskFormProps) {
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormControl>
-                <Input placeholder="Add a new task..." {...field} className="h-9" />
+                <Input placeholder="Add a new task..." {...field} className="h-9" disabled={!user} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,7 +83,7 @@ export function AddTaskForm({ status, onTaskAdded }: AddTaskFormProps) {
             type="submit"
             size="icon"
             className="h-9 w-9 flex-shrink-0"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !user}
             style={{
                 backgroundColor: 'hsl(var(--accent))',
                 color: 'hsl(var(--accent-foreground))',

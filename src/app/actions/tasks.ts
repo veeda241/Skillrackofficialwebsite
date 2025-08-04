@@ -33,7 +33,7 @@ export async function fetchTasks(): Promise<{ success: true; data: { columns: Co
 }
 
 export async function addTask(
-  values: Pick<Task, 'title' | 'status'>
+  values: Pick<Task, 'title' | 'status' | 'creator'>
 ): Promise<{ success: true; data: Task } | { success: false; error: string }> {
   try {
     const newTask: Task = {
@@ -53,12 +53,19 @@ export async function addTask(
 
 export async function updateTaskStatus(
   taskId: string,
-  status: Task['status']
+  status: Task['status'],
+  assigneeName: string
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
     const task = allTasks.find((t) => t.id === taskId);
     if (task) {
       task.status = status;
+      if (status === 'in-progress' || status === 'done') {
+        task.assignee = { name: assigneeName };
+      } else {
+        // If moved back to 'To Do', clear the assignee
+        task.assignee = undefined;
+      }
       revalidatePath('/tasks');
       return { success: true };
     }

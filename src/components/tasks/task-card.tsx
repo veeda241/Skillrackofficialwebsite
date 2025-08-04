@@ -1,7 +1,7 @@
 'use client';
 
 import { Task } from "@/app/types/tasks";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -61,7 +61,7 @@ export function TaskCard({ task }: { task: Task }) {
             {...listeners}
             className="cursor-grab active:cursor-grabbing touch-none"
         >
-            <CardHeader className="p-4">
+            <CardHeader className="p-4 pb-0">
                 <div className="flex items-center justify-between">
                     <h3 className="font-semibold">{task.title}</h3>
                     {task.assignee && (
@@ -73,23 +73,21 @@ export function TaskCard({ task }: { task: Task }) {
                                     </Avatar>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{task.assignee.name}</p>
+                                    <p>Assigned to {task.assignee.name}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     )}
                 </div>
             </CardHeader>
-            {task.description && (
-                <CardContent className="p-4 pt-0">
-                    <p className="text-sm text-muted-foreground">{task.description}</p>
-                </CardContent>
-            )}
-            <CardContent className="p-4 pt-0">
+             <CardContent className="p-4">
                 <Badge variant="outline" className={priorityClasses[task.priority]}>
                     {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
                 </Badge>
             </CardContent>
+            <CardFooter className="p-4 pt-0">
+                <p className="text-xs text-muted-foreground">Created by {task.creator}</p>
+            </CardFooter>
         </Card>
     );
 }

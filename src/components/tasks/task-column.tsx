@@ -5,8 +5,9 @@ import type { Column, Task } from "@/app/types/tasks";
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { TaskCard } from "./task-card";
 import { AddTaskForm } from './add-task-form';
+import type { User } from '@/lib/users';
 
-export function TaskColumn({ column, onTaskAdded }: { column: Column; onTaskAdded: () => void; }) {
+export function TaskColumn({ column, onTaskAdded, user }: { column: Column; onTaskAdded: () => void; user: Omit<User, 'password'> | null; }) {
     const tasksIds = useMemo(() => {
         return column.tasks.map((task) => task.id);
     }, [column.tasks]);
@@ -31,7 +32,7 @@ export function TaskColumn({ column, onTaskAdded }: { column: Column; onTaskAdde
                 </span>
             </div>
              <div className="p-2">
-                <AddTaskForm status={column.id as Task['status']} onTaskAdded={onTaskAdded} />
+                <AddTaskForm status={column.id as Task['status']} onTaskAdded={onTaskAdded} user={user} />
             </div>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto rounded-lg bg-muted/50 p-2 min-h-40">
                 <SortableContext items={tasksIds}>

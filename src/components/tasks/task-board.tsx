@@ -20,8 +20,9 @@ import {
 import { arrayMove } from '@dnd-kit/sortable';
 import { TaskCard } from './task-card';
 import { createPortal } from 'react-dom';
+import type { User } from '@/lib/users';
 
-export function TaskBoard() {
+export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
   const [columns, setColumns] = useState<Column[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,8 +87,8 @@ export function TaskBoard() {
     // This handles dropping a task into a new column
     if (activeColumn.id !== overColumn?.id) {
         const newStatus = overColumn?.id as Task['status'];
-        if (newStatus) {
-            await updateTaskStatus(activeId.toString(), newStatus);
+        if (newStatus && user) {
+            await updateTaskStatus(activeId.toString(), newStatus, user.name);
             getTasks(); // Refresh data from server
         }
     }
@@ -144,6 +145,10 @@ export function TaskBoard() {
         );
         const [movedTask] = activeColumn.tasks.splice(activeTaskIndex, 1);
         movedTask.status = overColumn.id as Task['status'];
+        if (user) {
+            movedTask.assignee = { name: user.name };
+        }
+
 
         const overTaskIndex = overColumn.tasks.findIndex(
           (t) => t.id === overId
@@ -173,6 +178,9 @@ export function TaskBoard() {
             const activeTaskIndex = activeColumn.tasks.findIndex((t) => t.id === activeId);
             const [movedTask] = activeColumn.tasks.splice(activeTaskIndex, 1);
             movedTask.status = overColumn.id as Task['status'];
+            if(user) {
+                movedTask.assignee = { name: user.name };
+            }
             overColumn.tasks.push(movedTask);
 
             return [...columns];
@@ -221,6 +229,7 @@ export function TaskBoard() {
               key={column.id}
               column={column}
               onTaskAdded={getTasks}
+              user={user}
             />
           ))}
       </div>
