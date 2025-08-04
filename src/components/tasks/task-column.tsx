@@ -1,0 +1,26 @@
+import { Column } from "@/app/types/tasks";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { TaskCard } from "./task-card";
+
+export function TaskColumn({ column }: { column: Column }) {
+    return (
+        <div className="flex w-80 flex-shrink-0 flex-col">
+            <div className="flex items-center justify-between p-2">
+                <h2 className="text-lg font-semibold">{column.title}</h2>
+                <span className="rounded-full bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
+                    {column.tasks.length}
+                </span>
+            </div>
+            <div className="flex flex-1 flex-col gap-4 overflow-y-auto rounded-lg bg-muted/50 p-2">
+                {column.tasks.map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                ))}
+                 {column.tasks.length === 0 && (
+                    <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/20">
+                        <p className="text-sm text-muted-foreground">No tasks</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
