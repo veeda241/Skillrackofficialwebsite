@@ -58,3 +58,15 @@ export async function signupAdmin(values: Omit<User, 'role'>): Promise<{ success
 
     return { success: true };
 }
+
+export async function getUsers(): Promise<{ success: true, data: Omit<User, 'password'>[] } | { success: false, error: string }> {
+    try {
+        // Return users without their passwords
+        const safeUsers = usersDb.map(({ password, ...user }) => user);
+        return { success: true, data: safeUsers };
+    } catch(e) {
+        console.error(e);
+        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
+        return { success: false, error: errorMessage };
+    }
+}
