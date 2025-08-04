@@ -4,11 +4,17 @@ import type { Hackathon } from '@/app/types/hackathon-updates';
 import { revalidatePath } from 'next/cache';
 
 // This is a simple in-memory store. In a real application, this would be a database.
-let allHackathons: Hackathon[] = [];
+// By storing it in a global object, we can ensure it persists across serverless function invocations.
+if (!global.allHackathons) {
+  global.allHackathons = [];
+}
+let allHackathons: Hackathon[] = global.allHackathons;
+
 
 export async function fetchHackathonUpdates(): Promise<{ success: true; data: { hackathons: Hackathon[] } } | { success: false; error: string }> {
   try {
-    return { success: true, data: { hackathons: allHackathons } };
+    // Return a deep copy to avoid mutations affecting the original array.
+    return { success: true, data: { hackathons: JSON.parse(JSON.stringify(allHackathons)) } };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
