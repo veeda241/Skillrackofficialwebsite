@@ -16,13 +16,14 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { Logo } from './logo';
+import { logout } from '@/app/actions/auth';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    // In a real app, you'd clear session/token here
+  const handleLogout = async () => {
+    await logout();
     router.push('/login');
   };
   

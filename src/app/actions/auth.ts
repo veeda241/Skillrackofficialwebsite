@@ -2,6 +2,14 @@
 
 import { usersDb, type User } from '@/lib/users';
 
+// Simple in-memory session store
+if (!global.session) {
+  global.session = { currentUser: null };
+}
+
+let session: { currentUser: Omit<User, 'password'> | null } = global.session;
+
+
 export async function login(values: { email: string; password?: string }): Promise<{ success: boolean; error?: string }> {
   console.log('Attempting to log in with:', values.email);
 
@@ -15,8 +23,24 @@ export async function login(values: { email: string; password?: string }): Promi
     return { success: false, error: 'Invalid password.' };
   }
 
+  const { password, ...userWithoutPassword } = user;
+  session.currentUser = userWithoutPassword;
+  console.log('User logged in, session set:', session.currentUser);
+
   return { success: true };
 }
+
+export async function logout(): Promise<{ success: true }> {
+    session.currentUser = null;
+    console.log('User logged out, session cleared.');
+    return { success: true };
+}
+
+
+export async function getCurrentUser(): Promise<Omit<User, 'password'> | null> {
+    return session.currentUser;
+}
+
 
 export async function signup(values: Omit<User, 'role'>): Promise<{ success: boolean; error?: string }> {
     console.log('Attempting to sign up with:', values.email);
