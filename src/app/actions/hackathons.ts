@@ -9,17 +9,8 @@ let allHackathons: Hackathon[] | null = null;
 
 async function initializeHackathons() {
     if (allHackathons === null) {
-        try {
-            const initialData = await getHackathonUpdates();
-            // Assign unique IDs to the initial set of hackathons
-            allHackathons = initialData.hackathons.map((h, index) => ({
-                 ...h,
-                 id: h.id || `${Date.now()}-${index}`
-            }));
-        } catch (e) {
-            console.error("Failed to initialize hackathons:", e);
-            allHackathons = []; // Start with an empty list if AI fails
-        }
+        // Start with an empty list. The AI will not be used to populate initial data.
+        allHackathons = []; 
     }
 }
 
@@ -34,7 +25,7 @@ export async function fetchHackathonUpdates(): Promise<{ success: true; data: Ha
   }
 }
 
-export async function addHackathon(hackathon: Omit<Hackathon, 'id'>): Promise<{ success: true } | { success: false; error: string }> {
+export async function addHackathon(hackathon: Omit<Hackathon, 'id'>): Promise<{ success:true } | { success: false; error: string }> {
     try {
         await initializeHackathons();
         const newHackathon: Hackathon = {
