@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { addHackathon } from '@/app/actions/hackathons.js';
-import { useRouter } from 'next/navigation';
 
 const hackathonFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }),
@@ -21,7 +20,6 @@ const hackathonFormSchema = z.object({
 
 export default function AdminHackathonsPage() {
   const { toast } = useToast();
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof hackathonFormSchema>>({
     resolver: zodResolver(hackathonFormSchema),
@@ -45,10 +43,9 @@ export default function AdminHackathonsPage() {
     if (result.success) {
         toast({
             title: 'Hackathon Submitted!',
-            description: `${values.title} has been added.`,
+            description: `${values.title} has been added. You can see it on the dashboard.`,
         });
         form.reset();
-        router.push('/dashboard');
     } else {
         toast({
             title: 'Error',
