@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { addPost } from '@/app/actions/posts';
+import type { User } from '@/lib/users';
 
 const postFormSchema = z.object({
   title: z.string().min(5, { message: 'Title must be at least 5 characters.' }),
@@ -24,9 +25,10 @@ const postFormSchema = z.object({
 
 type AddPostFormProps = {
   onPostAdded: () => void;
+  user: Omit<User, 'password'>
 };
 
-export function AddPostForm({ onPostAdded }: AddPostFormProps) {
+export function AddPostForm({ onPostAdded, user }: AddPostFormProps) {
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof postFormSchema>>({
@@ -38,10 +40,9 @@ export function AddPostForm({ onPostAdded }: AddPostFormProps) {
   });
 
   async function onSubmit(values: z.infer<typeof postFormSchema>) {
-    // In a real app, you'd get the author name from the current user's session
     const newPost = {
       ...values,
-      authorName: 'Ada Lovelace',
+      authorName: user.name,
       authorImage: `https://placehold.co/100x100.png`,
     };
 

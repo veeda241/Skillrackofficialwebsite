@@ -13,6 +13,7 @@ import { AddPostForm } from './add-post-form';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import type { User as UserType } from '@/lib/users';
 
 
 const getInitials = (name: string) => {
@@ -66,7 +67,7 @@ function PostCard({ post, onRemove }: { post: Post, onRemove: (id: string) => vo
     );
 }
 
-export function PostsList() {
+export function PostsList({ user }: { user: Omit<UserType, 'password'> | null }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +127,7 @@ export function PostsList() {
             </div>
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
                 <DialogTrigger asChild>
-                    <Button>
+                    <Button disabled={!user}>
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add Post
                     </Button>
@@ -138,7 +139,7 @@ export function PostsList() {
                            Share your thoughts, a tech discovery, or an update with the community.
                         </DialogDescription>
                     </DialogHeader>
-                    <AddPostForm onPostAdded={handlePostAdded} />
+                    {user && <AddPostForm onPostAdded={handlePostAdded} user={user} />}
                 </DialogContent>
             </Dialog>
         </div>
