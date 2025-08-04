@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { GraduationCap, LayoutDashboard, LogOut, MessageSquare, Shield, User } from 'lucide-react';
+import { LayoutDashboard, LogOut, MessageSquare, Shield, User } from 'lucide-react';
 import {
   SidebarProvider,
   Sidebar,
@@ -15,6 +15,7 @@ import {
   SidebarTrigger,
   SidebarInset,
 } from '@/components/ui/sidebar';
+import { Logo } from './logo';
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -30,7 +31,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg text-sidebar-primary">
-            <GraduationCap className="h-6 w-6" />
+            <Logo className="h-6 w-6" />
             <span className="group-data-[collapsible=icon]:hidden">SkillRack</span>
           </Link>
         </SidebarHeader>

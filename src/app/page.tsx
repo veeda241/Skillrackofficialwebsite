@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { GraduationCap, Briefcase, Lightbulb, Users, ShieldCheck } from 'lucide-react';
+import { Briefcase, Lightbulb, Users, ShieldCheck } from 'lucide-react';
+import { Logo } from '@/components/logo';
 
 export default function Home() {
   return (
@@ -9,7 +10,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <Link href="/" className="flex items-center gap-2 font-bold">
-            <GraduationCap className="h-6 w-6 text-primary" />
+            <Logo className="h-6 w-6 text-primary" />
             <span className="text-lg">SkillRack</span>
           </Link>
           <nav className="ml-auto flex items-center gap-2">

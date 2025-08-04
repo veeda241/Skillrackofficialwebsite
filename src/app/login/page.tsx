@@ -1,5 +1,5 @@
 import { LoginForm } from '@/components/auth/login-form';
-import { GraduationCap } from 'lucide-react';
+import { Logo } from '@/components/logo';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -8,7 +8,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center">
             <Link href="/" className="flex items-center gap-2 font-bold mb-4">
-                <GraduationCap className="h-8 w-8 text-primary" />
+                <Logo className="h-8 w-8 text-primary" />
                 <span className="text-2xl font-headline">SkillRack</span>
             </Link>
           <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
