@@ -1,27 +1,36 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-
-// This is a simple in-memory store for chat messages.
-// In a real application, you would use a database like Firestore.
-if (!global.allMessages) {
-  global.allMessages = [
-    { role: 'assistant', content: 'Welcome to the global chat! Messages are not persisted and will reset periodically. Be respectful.' },
-  ];
-}
+import fs from 'fs/promises';
+import path from 'path';
 
 type Message = {
   role: 'user' | 'assistant';
   content: string;
 };
 
-// Simple in-memory store
-let messages: Message[] = global.allMessages;
+const chatFilePath = path.join(process.cwd(), 'src', 'data', 'chat.json');
+
+async function getChatMessagesFromFile(): Promise<Message[]> {
+    try {
+        const data = await fs.readFile(chatFilePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return [];
+        }
+        throw error;
+    }
+}
+
+async function saveChatMessagesToFile(messages: Message[]): Promise<void> {
+    await fs.writeFile(chatFilePath, JSON.stringify(messages, null, 2));
+}
 
 export async function getChatMessages(): Promise<{ success: true; data: Message[] } | { success: false; error: string }> {
   try {
-    // Return a deep copy
-    return { success: true, data: JSON.parse(JSON.stringify(messages)) };
+    const messages = await getChatMessagesFromFile();
+    return { success: true, data: messages };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
@@ -31,6 +40,7 @@ export async function getChatMessages(): Promise<{ success: true; data: Message[
 
 export async function sendChatMessage(messageContent: string): Promise<{ success: true } | { success: false; error: string }> {
     try {
+        const messages = await getChatMessagesFromFile();
         const newMessage: Message = {
             role: 'user', // In a real app, this would be the user's ID/name
             content: messageContent,
@@ -41,6 +51,8 @@ export async function sendChatMessage(messageContent: string): Promise<{ success
         if (messages.length > 50) {
             messages.shift();
         }
+
+        await saveChatMessagesToFile(messages);
 
         revalidatePath('/chat');
         return { success: true };

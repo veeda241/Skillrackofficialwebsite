@@ -2,19 +2,31 @@
 
 import type { Hackathon } from '@/app/types/hackathon-updates';
 import { revalidatePath } from 'next/cache';
+import fs from 'fs/promises';
+import path from 'path';
 
-// This is a simple in-memory store. In a real application, this would be a database.
-// By storing it in a global object, we can ensure it persists across serverless function invocations.
-if (!global.allHackathons) {
-  global.allHackathons = [];
+const hackathonsFilePath = path.join(process.cwd(), 'src', 'data', 'hackathons.json');
+
+async function getHackathonsFromFile(): Promise<Hackathon[]> {
+    try {
+        const data = await fs.readFile(hackathonsFilePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return [];
+        }
+        throw error;
+    }
 }
-let allHackathons: Hackathon[] = global.allHackathons;
 
+async function saveHackathonsToFile(hackathons: Hackathon[]): Promise<void> {
+    await fs.writeFile(hackathonsFilePath, JSON.stringify(hackathons, null, 2));
+}
 
 export async function fetchHackathonUpdates(): Promise<{ success: true; data: { hackathons: Hackathon[] } } | { success: false; error: string }> {
   try {
-    // Return a deep copy to avoid mutations affecting the original array.
-    return { success: true, data: { hackathons: JSON.parse(JSON.stringify(allHackathons)) } };
+    const hackathons = await getHackathonsFromFile();
+    return { success: true, data: { hackathons } };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
@@ -24,14 +36,14 @@ export async function fetchHackathonUpdates(): Promise<{ success: true; data: { 
 
 export async function addHackathon(hackathon: Omit<Hackathon, 'id'>): Promise<{ success:true } | { success: false; error: string }> {
     try {
+        const allHackathons = await getHackathonsFromFile();
         const newHackathon: Hackathon = {
             ...hackathon,
             id: Date.now().toString(), // Simple unique ID
         };
-        // Add the new hackathon to the beginning of the list.
         allHackathons.unshift(newHackathon);
+        await saveHackathonsToFile(allHackathons);
         
-        // Revalidate the dashboard path to ensure it fetches the updated list.
         revalidatePath('/dashboard');
         return { success: true };
     } catch(e) {
@@ -43,9 +55,11 @@ export async function addHackathon(hackathon: Omit<Hackathon, 'id'>): Promise<{ 
 
 export async function removeHackathon(hackathonId: string): Promise<{ success: true } | { success: false; error: string }> {
     try {
+        let allHackathons = await getHackathonsFromFile();
         const index = allHackathons.findIndex((h) => h.id === hackathonId);
         if (index > -1) {
             allHackathons.splice(index, 1);
+            await saveHackathonsToFile(allHackathons);
         }
         revalidatePath('/dashboard');
         return { success: true };

@@ -2,19 +2,31 @@
 
 import type { Post } from '@/app/types/posts';
 import { revalidatePath } from 'next/cache';
+import fs from 'fs/promises';
+import path from 'path';
 
-// This is a simple in-memory store. In a real application, this would be a database.
-// By storing it in a global object, we can ensure it persists across serverless function invocations.
-if (!global.allPosts) {
-  global.allPosts = [];
+const postsFilePath = path.join(process.cwd(), 'src', 'data', 'posts.json');
+
+async function getPostsFromFile(): Promise<Post[]> {
+    try {
+        const data = await fs.readFile(postsFilePath, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return [];
+        }
+        throw error;
+    }
 }
-let allPosts: Post[] = global.allPosts;
 
+async function savePostsToFile(posts: Post[]): Promise<void> {
+    await fs.writeFile(postsFilePath, JSON.stringify(posts, null, 2));
+}
 
 export async function fetchPosts(): Promise<{ success: true; data: { posts: Post[] } } | { success: false; error: string }> {
   try {
-    // Return a deep copy to avoid mutations affecting the original array.
-    return { success: true, data: { posts: JSON.parse(JSON.stringify(allPosts)) } };
+    const posts = await getPostsFromFile();
+    return { success: true, data: { posts } };
   } catch (e) {
     console.error(e);
     const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
@@ -24,13 +36,14 @@ export async function fetchPosts(): Promise<{ success: true; data: { posts: Post
 
 export async function addPost(post: Omit<Post, 'id' | 'createdAt'>): Promise<{ success:true } | { success: false; error: string }> {
     try {
+        const allPosts = await getPostsFromFile();
         const newPost: Post = {
             ...post,
             id: Date.now().toString(), // Simple unique ID
             createdAt: new Date().toISOString(),
         };
-        // Add the new post to the beginning of the list.
         allPosts.unshift(newPost);
+        await savePostsToFile(allPosts);
         
         revalidatePath('/posts');
         return { success: true };
@@ -43,9 +56,11 @@ export async function addPost(post: Omit<Post, 'id' | 'createdAt'>): Promise<{ s
 
 export async function removePost(postId: string): Promise<{ success: true } | { success: false; error: string }> {
     try {
+        let allPosts = await getPostsFromFile();
         const index = allPosts.findIndex((p) => p.id === postId);
         if (index > -1) {
             allPosts.splice(index, 1);
+            await savePostsToFile(allPosts);
         }
         revalidatePath('/posts');
         return { success: true };
