@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo, useTransition } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { Column, Task } from '@/app/types/tasks';
 import { fetchTasks, updateTaskStatus, removeTask } from '@/app/actions/tasks';
 import { Skeleton } from '../ui/skeleton';
@@ -29,6 +29,12 @@ export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
   const [error, setError] = useState<string | null>(null);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
@@ -208,6 +214,28 @@ export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
     }
   };
 
+  if (!isClient) {
+    return (
+        <div className="flex h-full flex-grow gap-4 overflow-x-auto p-1">
+          <div className="flex flex-col w-80 flex-shrink-0 gap-4">
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="flex flex-col w-80 flex-shrink-0 gap-4">
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <div className="flex flex-col w-80 flex-shrink-0 gap-4">
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
+      );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -218,16 +246,16 @@ export function TaskBoard({ user }: { user: Omit<User, 'password'> | null }) {
       <div className="flex h-full flex-grow gap-4 overflow-x-auto p-1">
         {isLoading && (
           <>
-            <div className="flex flex-col w-72 flex-shrink-0 gap-4">
+            <div className="flex flex-col w-80 flex-shrink-0 gap-4">
               <Skeleton className="h-8 w-1/2" />
               <Skeleton className="h-24 w-full" />
               <Skeleton className="h-24 w-full" />
             </div>
-            <div className="flex flex-col w-72 flex-shrink-0 gap-4">
+            <div className="flex flex-col w-80 flex-shrink-0 gap-4">
               <Skeleton className="h-8 w-1/2" />
               <Skeleton className="h-24 w-full" />
             </div>
-            <div className="flex flex-col w-72 flex-shrink-0 gap-4">
+            <div className="flex flex-col w-80 flex-shrink-0 gap-4">
               <Skeleton className="h-8 w-1/2" />
               <Skeleton className="h-24 w-full" />
               <Skeleton className="h-24 w-full" />
